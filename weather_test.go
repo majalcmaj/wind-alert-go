@@ -1,14 +1,44 @@
 package main
 
-import "testing"
+import (
+	"encoding/json"
+	"io/ioutil"
+	"log"
+	"testing"
+	"reflect"
+)
 
-func MyFunction(i int) int {
-	return i * 2;
+type response struct {
+	Current current `json:"current"`
 }
 
-func TestMyFunction(t *testing.T) {
-    result := MyFunction(5)
-    if result != 10 {
-        t.Errorf("MyFunction(5) returned %d, but expected 10", result)
-    }
+type current struct {
+	WindSpeed float32 `json:"wind_speed"`
+	WindAngle float32 `json:"wind_deg"`
+}
+
+func readTestData() (*response, error) {
+	file, err := ioutil.ReadFile("testData/openWeatherMap.json")
+	if err != nil {
+		return nil, err
+	}
+
+	var resp response
+	if json.Unmarshal(file, &resp) != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
+func TestParsingOutValues(t *testing.T) {
+	testData, err := readTestData()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	expected := response{Current: current{WindSpeed: 3.13, WindAngle: 93.0}};
+	if !reflect.DeepEqual(testData, &expected) {
+		t.Errorf("Expected parsed response was %+v but got %+v", &expected, testData)
+	}
 }
