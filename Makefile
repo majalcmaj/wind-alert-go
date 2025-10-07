@@ -15,4 +15,7 @@ build-docker:
 run-docker:
 	docker run --name wind-alert --rm -p 9000:8080 --entrypoint /usr/local/bin/aws-lambda-rie $(docker-image)
 
+run-test-request:
+	curl "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{}'
+
 
