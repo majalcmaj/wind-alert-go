@@ -1,0 +1,60 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: AWS SAM template for the Wind Alert application
+Resources:
+  WindalertGo:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Description: ''
+      MemorySize: 128
+      Timeout: 3
+      Architectures:
+        - x86_64
+      EphemeralStorage:
+        Size: 512
+      EventInvokeConfig:
+        MaximumEventAgeInSeconds: 21600
+        MaximumRetryAttempts: 2
+      ImageUri: 
+        Fn::Join: 
+          - '/'
+          - - !GetAtt WindAlertRepository.RepositoryUri 
+            - wind-alert:latest
+      PackageType: Image
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - logs:CreateLogGroup
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+              Resource: '*'
+      # RecursiveLoop: Terminate
+      # SnapStart:
+      #  ApplyOn: None
+  WindAlertRepository: 
+    Type: AWS::ECR::Repository
+    Properties: 
+      RepositoryName: "wind-alert-docker-repository"
+  WindAlertRepoPolicy:
+    Type: AWS::ECR::RegistryPolicy
+    Properties:
+      PolicyText: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Sid: AllowImageRetrievalForLambda
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: 
+              - "ecr:BatchGetImage"
+              - "ecr:DeleteRepositoryPolicy"
+              - "ecr:GetDownloadUrlForLayer"
+              - "ecr:GetRepositoryPolicy"
+              - "ecr:SetRepositoryPolicy"
+            Conditions:
+              StringLike:
+                "aws:sourceArn": !GetAtt WindalertGo.Arn
+        Resource: !GetAtt WindAlertRepository.Arn
