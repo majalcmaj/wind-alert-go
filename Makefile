@@ -1,8 +1,12 @@
 clean:
-	rm -rf bin/
+	[ ! -d bin ] || rm -rf bin
+
+test:
+	go test
 
 build:
 	go build -tags lambda.norpc -o bin/lambda
 
-test:
-	go test
+build-docker:
+	docker buildx build --platform linux/amd64 --provenance=false -t wind-alert:latest .
+
