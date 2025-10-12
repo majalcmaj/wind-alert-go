@@ -7,7 +7,7 @@ test:
 	go test -v ./...
 
 build:
-	go build -tags lambda.norpc -o bin/lambda
+	go build -tags lambda.norpc -o bin/ ./...
 
 build-docker:
 	docker buildx build --platform linux/amd64 --provenance=false -t $(docker-image) .
