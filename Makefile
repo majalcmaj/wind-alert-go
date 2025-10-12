@@ -9,6 +9,9 @@ test:
 build:
 	go build -tags lambda.norpc -o bin/ ./...
 
+format: 
+	go fmt ./...
+
 build-docker:
 	docker buildx build --platform linux/amd64 --provenance=false -t $(docker-image) .
 

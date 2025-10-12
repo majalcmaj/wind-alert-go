@@ -13,12 +13,12 @@ type current struct {
 	WindAngle float32 `json:"wind_deg"`
 }
 
-func ParseOpenweatherResponse(content *[]byte) (*WeatherData, error) {
+func ParseOpenweatherResponse(content *[]byte) (*WeatherReading, error) {
 	var resp response
 	err := json.Unmarshal(*content, &resp)
 	if err != nil {
 		return nil, err
 	}
-	
-	return &WeatherData{WindSpeed: resp.Current.WindSpeed, WindAngle: resp.Current.WindAngle}, nil
+
+	return &WeatherReading{WindSpeed: resp.Current.WindSpeed, WindAngle: resp.Current.WindAngle}, nil
 }

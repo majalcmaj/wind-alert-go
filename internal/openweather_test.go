@@ -1,10 +1,10 @@
 package internal
 
 import (
-	"os"
 	"log"
-	"testing"
+	"os"
 	"reflect"
+	"testing"
 )
 
 func readTestData() (*[]byte, error) {
@@ -28,7 +28,7 @@ func TestParsingOutValues(t *testing.T) {
 		log.Fatal(err)
 	}
 
-	expected := WeatherData{WindSpeed: 3.13, WindAngle: 93.0};
+	expected := WeatherReading{WindSpeed: 3.13, WindAngle: 93.0}
 	if !reflect.DeepEqual(response, &expected) {
 		t.Errorf("Expected parsed response was %+v but got %+v", &expected, content)
 	}

@@ -1,7 +1,21 @@
 package internal
 
-type Rule struct {}
+type Range struct {
+	From float32
+	To   float32
+}
 
-func RunRuleEngine(rules []Rule) (bool, error) {
+type Rule struct {
+	AngleRange Range
+	SpeedRange Range
+}
+
+func RunRuleEngine(reading WeatherReading, rules *[]Rule) (bool, error) {
+	for _, rule := range *rules {
+		if reading.WindAngle >= rule.AngleRange.From && reading.WindAngle <= rule.AngleRange.To &&
+			reading.WindSpeed >= rule.SpeedRange.From && reading.WindSpeed <= rule.SpeedRange.To {
+			return true, nil
+		}
+	}
 	return false, nil
 }

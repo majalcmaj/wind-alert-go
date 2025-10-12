@@ -1,6 +1,6 @@
 package internal
 
-type WeatherData struct {
+type WeatherReading struct {
 	WindSpeed float32
 	WindAngle float32
 }
