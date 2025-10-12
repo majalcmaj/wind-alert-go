@@ -4,7 +4,7 @@ clean:
 	[ ! -d bin ] || rm -rf bin
 
 test:
-	go test
+	go test -v ./...
 
 build:
 	go build -tags lambda.norpc -o bin/lambda

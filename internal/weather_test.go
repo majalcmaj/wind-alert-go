@@ -18,7 +18,7 @@ type current struct {
 }
 
 func readTestData() (*response, error) {
-	file, err := ioutil.ReadFile("testData/openWeatherMap.json")
+	file, err := ioutil.ReadFile("testdata/openWeatherMap.json")
 	if err != nil {
 		return nil, err
 	}
