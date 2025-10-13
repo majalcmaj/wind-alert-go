@@ -10,14 +10,21 @@ type Rule struct {
 	SpeedRange Range
 }
 
-func (_ Range) withinAngleRange(angle float32) bool {
-	return true
+func (rng Range) withinAngleRange(angle float32) bool {
+	if rng.From > rng.To {
+		return angle >= rng.From || angle <= rng.To
+	}
+	return rng.withinRange(angle)
+}
+
+func (rng Range) withinRange(number float32) bool {
+	return number >= rng.From && number <= rng.To
 }
 
 func RunRuleEngine(reading WeatherReading, rules *[]Rule) (bool, error) {
 	for _, rule := range *rules {
-		if reading.WindAngle >= rule.AngleRange.From && reading.WindAngle <= rule.AngleRange.To &&
-			reading.WindSpeed >= rule.SpeedRange.From && reading.WindSpeed <= rule.SpeedRange.To {
+		if rule.AngleRange.withinAngleRange(reading.WindAngle) &&
+			rule.SpeedRange.withinRange(reading.WindSpeed) {
 			return true, nil
 		}
 	}
