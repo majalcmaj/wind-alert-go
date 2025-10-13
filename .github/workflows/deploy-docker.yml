@@ -24,8 +24,9 @@ jobs:
       with:
         go-version: 1.25
 
-    - name: Run tests
+    - name: Run lint and tests
       run: |
+        make lint
         make test
 
 #    - name: Configure AWS Credentials
