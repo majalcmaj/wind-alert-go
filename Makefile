@@ -7,6 +7,9 @@ clean:
 test:
 	go test -v ./...
 
+test-coverage:
+	go test -timeout=30s -cover -coverprofile test-coverage.out ./... && go tool cover -html=test-coverage.out
+
 build:
 	go build -tags lambda.norpc -o bin/ ./...
 
