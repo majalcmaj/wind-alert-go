@@ -14,10 +14,9 @@ func TestPassingEmptyRule(t *testing.T) {
 		t.Errorf("Got an error: %v", err)
 	}
 	if result != false {
-		t.Errorf("Rule engine should return false for empty rules")
+		t.Errorf("Rule engine should return false when no rules are passed")
 	}
 }
-
 
 func TestPassingNoMatchingRules(t *testing.T) {
 	reading := WeatherReading{WindSpeed: 8.0, WindAngle: 20.1}
@@ -70,5 +69,43 @@ func TestPassingSingleMatchingRule(t *testing.T) {
 	}
 	if result != true {
 		t.Errorf("Rule engine should return true for a data matching the rule")
+	}
+}
+
+func TestRuleWithAngleRangeFromHigherThanToAngleLessThanTo(t *testing.T) {
+	reading := WeatherReading{WindSpeed: 5.0, WindAngle: 83}
+	rules := []Rule{
+		{
+			SpeedRange: Range{From: 0.0, To: 7.0},
+			AngleRange: Range{From: 270.0, To: 90.0},
+		},
+	}
+
+	result, err := RunRuleEngine(reading, &rules)
+
+	if err != nil {
+		t.Errorf("Got an error: %v", err)
+	}
+	if result != true {
+		t.Errorf("Rule engine should return true when rule's from is higher than to and angle is less than to")
+	}
+}
+
+func TestRuleWithAngleRangeFromHigherThanToAngleBiggerThanFrom(t *testing.T) {
+	reading := WeatherReading{WindSpeed: 5.0, WindAngle: 300}
+	rules := []Rule{
+		{
+			SpeedRange: Range{From: 0.0, To: 7.0},
+			AngleRange: Range{From: 270.0, To: 90.0},
+		},
+	}
+
+	result, err := RunRuleEngine(reading, &rules)
+
+	if err != nil {
+		t.Errorf("Got an error: %v", err)
+	}
+	if result != true {
+		t.Errorf("Rule engine should return true when rule's from is higher than to and angle is bigger than from")
 	}
 }
