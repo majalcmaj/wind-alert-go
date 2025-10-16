@@ -27,6 +27,7 @@ jobs:
     - name: Run lint and tests
       run: |
         make lint
+        make build
         make test
 
 #    - name: Configure AWS Credentials
