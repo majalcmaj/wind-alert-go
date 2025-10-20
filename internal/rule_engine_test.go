@@ -2,10 +2,11 @@ package internal
 
 import (
 	"testing"
+	"time"
 )
 
 func TestPassingEmptyRule(t *testing.T) {
-	reading := WeatherReading{WindSpeed: 10.0, WindAngle: 30.0}
+	reading := WindDataPoint{Time: time.Now(), WindSpeed: 10.0, WindAngle: 30.0}
 	rules := []Rule{}
 
 	result, err := RunRuleEngine(reading, &rules)
@@ -19,7 +20,7 @@ func TestPassingEmptyRule(t *testing.T) {
 }
 
 func TestPassingNoMatchingRules(t *testing.T) {
-	reading := WeatherReading{WindSpeed: 8.0, WindAngle: 20.1}
+	reading := WindDataPoint{Time: time.Now(), WindSpeed: 8.0, WindAngle: 20.1}
 	rules := []Rule{
 		{ // Not matching anything
 			SpeedRange: Range{From: 0.0, To: 7.0},
@@ -46,7 +47,7 @@ func TestPassingNoMatchingRules(t *testing.T) {
 }
 
 func TestPassingSingleMatchingRule(t *testing.T) {
-	reading := WeatherReading{WindSpeed: 8.0, WindAngle: 20.1}
+	reading := WindDataPoint{Time: time.Now(), WindSpeed: 8.0, WindAngle: 20.1}
 	rules := []Rule{
 		{ // Not matching rule
 			SpeedRange: Range{From: 0.0, To: 7.0},
@@ -73,7 +74,7 @@ func TestPassingSingleMatchingRule(t *testing.T) {
 }
 
 func TestRuleWithAngleRangeFromHigherThanToAngleLessThanTo(t *testing.T) {
-	reading := WeatherReading{WindSpeed: 5.0, WindAngle: 83}
+	reading := WindDataPoint{Time: time.Now(), WindSpeed: 5.0, WindAngle: 83}
 	rules := []Rule{
 		{
 			SpeedRange: Range{From: 0.0, To: 7.0},
@@ -92,7 +93,7 @@ func TestRuleWithAngleRangeFromHigherThanToAngleLessThanTo(t *testing.T) {
 }
 
 func TestRuleWithAngleRangeFromHigherThanToAngleBiggerThanFrom(t *testing.T) {
-	reading := WeatherReading{WindSpeed: 5.0, WindAngle: 300}
+	reading := WindDataPoint{Time: time.Now(), WindSpeed: 5.0, WindAngle: 300}
 	rules := []Rule{
 		{
 			SpeedRange: Range{From: 0.0, To: 7.0},

@@ -5,18 +5,23 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 )
 
-type response struct {
-	Current current `json:"current"`
+type reading struct {
+	Dt        int     `json:"dt"`
+	WindSpeed float64 `json:"wind_speed"`
+	WindDeg   int     `json:"wind_deg"`
 }
 
-type current struct {
-	WindSpeed float32 `json:"wind_speed"`
-	WindAngle float32 `json:"wind_deg"`
+type OpenWeatherResponse struct {
+	Lat    float64   `json:"lat"`
+	Lon    float64   `json:"lon"`
+	Hourly []reading `json:"hourly"`
+	Daily  []reading `json:"daily"`
 }
 
-func CallOpenWeather(latitude float32, longitude float32, token string) (*WeatherReading, error){
+func CallOpenWeather(latitude float32, longitude float32, token string) (*WeatherReading, error) {
 	url := fmt.Sprintf("https://api.openweathermap.org/data/3.0/onecall?lat=%f&lon=%f&exclude=current,minutely,alerts&appid=%s", latitude, longitude, token)
 
 	response, err := http.Get(url)
@@ -42,11 +47,30 @@ func CallOpenWeather(latitude float32, longitude float32, token string) (*Weathe
 }
 
 func ParseOpenweatherResponse(content *[]byte) (*WeatherReading, error) {
-	var resp response
+	var resp OpenWeatherResponse
 	err := json.Unmarshal(*content, &resp)
 	if err != nil {
 		return nil, err
 	}
 
-	return &WeatherReading{WindSpeed: resp.Current.WindSpeed, WindAngle: resp.Current.WindAngle}, nil
+	return &WeatherReading{
+		Lat: resp.Lat,
+		Lon: resp.Lon,
+		Readings: map[string]*[]WindDataPoint{
+			"hourly": getWindDatapoints(&resp.Hourly),
+			"daily":  getWindDatapoints(&resp.Daily),
+		},
+	}, nil
+}
+
+func getWindDatapoints(readings *[]reading) *[]WindDataPoint {
+	result := make([]WindDataPoint, len(*readings))
+	for idx, reading := range *readings {
+		result[idx] = WindDataPoint{
+			Time:      time.Unix(int64(reading.Dt), 0),
+			WindSpeed: float32(reading.WindSpeed),
+			WindAngle: float32(reading.WindDeg),
+		}
+	}
+	return &result
 }

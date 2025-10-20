@@ -5,6 +5,7 @@ import (
 	"os"
 	"reflect"
 	"testing"
+	"time"
 )
 
 func readTestData() (*[]byte, error) {
@@ -28,8 +29,27 @@ func TestParsingOutValues(t *testing.T) {
 		log.Fatal(err)
 	}
 
-	expected := WeatherReading{WindSpeed: 3.13, WindAngle: 93.0}
+	expected := WeatherReading{
+		Lat: 33.44,
+		Lon: -94.04,
+		Readings: map[string]*[]WindDataPoint{
+			"hourly": {
+				{
+					Time:      time.Unix(1684926000, 0),
+					WindSpeed: 2.58,
+					WindAngle: 86,
+				},
+			},
+			"daily": {
+				{
+					Time:      time.Unix(1684951200, 0),
+					WindSpeed: 3.98,
+					WindAngle: 76,
+				},
+			},
+		},
+	}
 	if !reflect.DeepEqual(response, &expected) {
-		t.Errorf("Expected parsed response was %+v but got %+v", &expected, content)
+		t.Errorf("Expected parsed response was %+v but got %+v", &expected, response)
 	}
 }
