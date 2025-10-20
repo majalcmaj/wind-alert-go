@@ -41,8 +41,6 @@ func CallOpenWeather(latitude float32, longitude float32, token string) (*Weathe
 		return nil, err
 	}
 
-	// TODO: this is not good - the format is different.
-	// See: https://openweathermap.org/api/one-call-3#example
 	return ParseOpenweatherResponse(&body)
 }
 

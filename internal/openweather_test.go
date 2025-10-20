@@ -35,14 +35,14 @@ func TestParsingOutValues(t *testing.T) {
 		Readings: map[string]*[]WindDataPoint{
 			"hourly": {
 				{
-					Time:      time.Unix(1684926000, 0),
+					Time: time.Unix(1684926000, 0),
 					WindSpeed: 2.58,
 					WindAngle: 86,
 				},
 			},
 			"daily": {
 				{
-					Time:      time.Unix(1684951200, 0),
+					Time: time.Unix(1684951200, 0),
 					WindSpeed: 3.98,
 					WindAngle: 76,
 				},
