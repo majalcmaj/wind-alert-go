@@ -5,7 +5,11 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
+	"strings"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 type reading struct {
@@ -14,38 +18,58 @@ type reading struct {
 	WindDeg   int     `json:"wind_deg"`
 }
 
-type OpenWeatherResponse struct {
+type openWeatherResponse struct {
 	Lat    float64   `json:"lat"`
 	Lon    float64   `json:"lon"`
 	Hourly []reading `json:"hourly"`
 	Daily  []reading `json:"daily"`
 }
 
-func CallOpenWeather(latitude float32, longitude float32, token string) (*WeatherReading, error) {
-	url := fmt.Sprintf("https://api.openweathermap.org/data/3.0/onecall?lat=%f&lon=%f&exclude=current,minutely,alerts&appid=%s", latitude, longitude, token)
+type OpenWeather struct {
+	baseUrl string
+	accessToken string
+}
 
-	response, err := http.Get(url)
+func NewOpenWeather(baseUrl, accessToken string) (*OpenWeather, error) {
+	if strings.TrimSpace(baseUrl) == "" || strings.TrimSpace(accessToken) == "" {
+		return nil, errors.Errorf("Both the baseUrl and accessToken are required")
+	} 
+	return &OpenWeather{baseUrl, accessToken}, nil
+}
+
+func (o *OpenWeather) GetForecast(latitude float32, longitude float32) (*WeatherReading, error) {
+	url := fmt.Sprintf("%s/data/3.0/onecall?lat=%f&lon=%f&exclude=current,minutely,alerts&appid=%s", o.baseUrl, latitude, longitude, o.accessToken)
+
+	client := http.DefaultClient
+	
+	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "Cannot create a request")
+	}
+	req.Header.Add("Accept", "application/json")
+
+	response, err := client.Do(req)
+	if err != nil {
+		return nil, errors.Wrap(err, "Could not make a request")
 	}
 	defer func() {
 		err := response.Body.Close()
 		if err != nil {
-			_ = fmt.Errorf("warning: error when closing the response body: %+v", err)
+			fmt.Fprint(os.Stderr, errors.Errorf("warning: error when closing the response body: %+v", err))
 		}
 	}()
 
 	body, err := io.ReadAll(response.Body)
 
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "Could not parse response body")
 	}
 
-	return ParseOpenweatherResponse(&body)
+	return parseOpenweatherResponse(&body)
 }
 
-func ParseOpenweatherResponse(content *[]byte) (*WeatherReading, error) {
-	var resp OpenWeatherResponse
+func parseOpenweatherResponse(content *[]byte) (*WeatherReading, error) {
+	var resp openWeatherResponse
 	err := json.Unmarshal(*content, &resp)
 	if err != nil {
 		return nil, err

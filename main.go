@@ -20,10 +20,14 @@ func handler(ctx context.Context, event events.APIGatewayProxyRequest) (*events.
 		return nil, errors.New("OPENWEATHER_TOKEN env variable must be set")
 	}
 
-	forecast, error := internal.CallOpenWeather(54.646034, 18.512407, openWeatherToken)
+	openWeather, err := internal.NewOpenWeather("https://api.openweathermap.org", openWeatherToken)
+	if err != nil {
+		return nil, err
+	}
+	forecast, err := openWeather.GetForecast(54.646034, 18.512407)
 
-	if error != nil {
-		return nil, error
+	if err != nil {
+		return nil, err
 	}
 
 	response := events.APIGatewayProxyResponse{
