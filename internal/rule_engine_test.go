@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"math"
 	"testing"
 	"time"
 )
@@ -20,19 +21,27 @@ func TestPassingEmptyRule(t *testing.T) {
 }
 
 func TestPassingNoMatchingRules(t *testing.T) {
-	reading := WindDataPoint{Time: time.Now(), WindSpeed: 8.0, WindAngle: 20.1}
+	reading := WindDataPoint{Time: getTimeForHour(12.37), WindSpeed: 8.0, WindAngle: 20.1}
 	rules := []Rule{
 		{ // Not matching anything
 			SpeedRange: Range{From: 0.0, To: 7.0},
 			AngleRange: Range{From: 95.0, To: 130.37},
+			HourRange:  Range{From: 20.0, To: 7.0},
 		},
 		{ // Not matching speed
 			SpeedRange: Range{From: 20.1, To: 30.4},
 			AngleRange: Range{From: 15.0, To: 21.37},
+			HourRange:  Range{From: 10.0, To: 20.0},
 		},
 		{ // Not matching angle
 			SpeedRange: Range{From: 7.0, To: 13.5},
 			AngleRange: Range{From: 0.2, To: 2.137},
+			HourRange:  Range{From: 10.0, To: 20.0},
+		},
+		{ // Not matching hour
+			SpeedRange: Range{From: 7.0, To: 13.5},
+			AngleRange: Range{From: 0.2, To: 21.37},
+			HourRange:  Range{From: 20.0, To: 4.0},
 		},
 	}
 
@@ -47,19 +56,22 @@ func TestPassingNoMatchingRules(t *testing.T) {
 }
 
 func TestPassingSingleMatchingRule(t *testing.T) {
-	reading := WindDataPoint{Time: time.Now(), WindSpeed: 8.0, WindAngle: 20.1}
+	reading := WindDataPoint{Time: getTimeForHour(1.0), WindSpeed: 8.0, WindAngle: 20.1}
 	rules := []Rule{
 		{ // Not matching rule
 			SpeedRange: Range{From: 0.0, To: 7.0},
 			AngleRange: Range{From: 95.0, To: 130.37},
+			HourRange:  Range{From: 8.23, To: 21.37},
 		},
 		{ // Finally - a matching rule
 			SpeedRange: Range{From: 0.0, To: 10.0},
 			AngleRange: Range{From: 15.0, To: 21.37},
+			HourRange:  Range{From: 21.37, To: 8.10},
 		},
 		{ // Another not matching angle
 			SpeedRange: Range{From: 7.0, To: 13.5},
 			AngleRange: Range{From: 0.2, To: 2.137},
+			HourRange:  Range{From: 20.0, To: 7.0},
 		},
 	}
 
@@ -74,11 +86,12 @@ func TestPassingSingleMatchingRule(t *testing.T) {
 }
 
 func TestRuleWithAngleRangeFromHigherThanToAngleLessThanTo(t *testing.T) {
-	reading := WindDataPoint{Time: time.Now(), WindSpeed: 5.0, WindAngle: 83}
+	reading := WindDataPoint{Time: getTimeForHour(10.0), WindSpeed: 5.0, WindAngle: 83}
 	rules := []Rule{
 		{
 			SpeedRange: Range{From: 0.0, To: 7.0},
 			AngleRange: Range{From: 270.0, To: 90.0},
+			HourRange:  Range{From: 0.0, To: 23.99},
 		},
 	}
 
@@ -93,11 +106,12 @@ func TestRuleWithAngleRangeFromHigherThanToAngleLessThanTo(t *testing.T) {
 }
 
 func TestRuleWithAngleRangeFromHigherThanToAngleBiggerThanFrom(t *testing.T) {
-	reading := WindDataPoint{Time: time.Now(), WindSpeed: 5.0, WindAngle: 300}
+	reading := WindDataPoint{Time: getTimeForHour(12.01), WindSpeed: 5.0, WindAngle: 300}
 	rules := []Rule{
 		{
 			SpeedRange: Range{From: 0.0, To: 7.0},
 			AngleRange: Range{From: 270.0, To: 90.0},
+			HourRange:  Range{From: 8.02, To: 13.12},
 		},
 	}
 
@@ -109,4 +123,8 @@ func TestRuleWithAngleRangeFromHigherThanToAngleBiggerThanFrom(t *testing.T) {
 	if result != true {
 		t.Errorf("Rule engine should return true when rule's from is higher than to and angle is bigger than from")
 	}
+}
+
+func getTimeForHour(hour float64) time.Time {
+	return time.Date(2025, time.November, 1, int(hour), int((hour - math.Floor(hour)*60.0)), 0, 0, time.UTC)
 }

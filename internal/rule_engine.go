@@ -8,6 +8,7 @@ type Range struct {
 type Rule struct {
 	AngleRange Range
 	SpeedRange Range
+	HourRange  Range
 }
 
 func (rng Range) withinAngleRange(angle float32) bool {
