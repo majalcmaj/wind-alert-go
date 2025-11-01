@@ -26,14 +26,14 @@ type openWeatherResponse struct {
 }
 
 type OpenWeather struct {
-	baseUrl string
+	baseUrl     string
 	accessToken string
 }
 
 func NewOpenWeather(baseUrl, accessToken string) (*OpenWeather, error) {
 	if strings.TrimSpace(baseUrl) == "" || strings.TrimSpace(accessToken) == "" {
 		return nil, errors.Errorf("Both the baseUrl and accessToken are required")
-	} 
+	}
 	return &OpenWeather{baseUrl, accessToken}, nil
 }
 
@@ -41,7 +41,7 @@ func (o *OpenWeather) GetForecast(latitude float32, longitude float32) (*Weather
 	url := fmt.Sprintf("%s/data/3.0/onecall?lat=%f&lon=%f&exclude=current,minutely,alerts&appid=%s", o.baseUrl, latitude, longitude, o.accessToken)
 
 	client := http.DefaultClient
-	
+
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "Cannot create a request")

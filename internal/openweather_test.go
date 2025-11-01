@@ -10,14 +10,6 @@ import (
 	"time"
 )
 
-func readTestData() (*[]byte, error) {
-	content, err := os.ReadFile("testdata/openWeatherMap.json")
-	if err != nil {
-		return nil, err
-	}
-	return &content, nil
-}
-
 func TestMakingOpenweatherRequest(t *testing.T) {
 	const lat = 33.44
 	const lon = -94.04
@@ -28,13 +20,13 @@ func TestMakingOpenweatherRequest(t *testing.T) {
 			t.Errorf("Expected the context path %s but got %s", expectedPath, r.URL.Path)
 		}
 
-		for k, v := range map[string]string {
-			"lat": fmt.Sprintf("%f", lat),
-			"lon": fmt.Sprintf("%f", lon),
-			"token": token,
+		for k, v := range map[string]string{
+			"lat":     fmt.Sprintf("%f", lat),
+			"lon":     fmt.Sprintf("%f", lon),
+			"token":   token,
 			"exclude": "current,minutely,alerts",
 		} {
-			if ! r.URL.Query().Has(k) && r.URL.Query().Get(k) == v {
+			if !r.URL.Query().Has(k) && r.URL.Query().Get(k) == v {
 				t.Errorf("Expected query parameter %s=%s but it was not found in %s", k, v, r.URL.RawQuery)
 			}
 		}
@@ -86,4 +78,12 @@ func TestMakingOpenweatherRequest(t *testing.T) {
 	if !reflect.DeepEqual(response, &expected) {
 		t.Errorf("Expected parsed response was %+v but got %+v", &expected, response)
 	}
+}
+
+func readTestData() (*[]byte, error) {
+	content, err := os.ReadFile("testdata/openWeatherMap.json")
+	if err != nil {
+		return nil, err
+	}
+	return &content, nil
 }
