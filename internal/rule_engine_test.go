@@ -125,6 +125,26 @@ func TestRuleWithAngleRangeFromHigherThanToAngleBiggerThanFrom(t *testing.T) {
 	}
 }
 
+func TestRuleWithHourRangeFromHigherThanToAngleBiggerThanFrom(t *testing.T) {
+	reading := WindDataPoint{Time: getTimeForHour(8.01), WindSpeed: 5.0, WindAngle: 300}
+	rules := []Rule{
+		{
+			SpeedRange: Range{From: 0.0, To: 7.0},
+			AngleRange: Range{From: 290.0, To: 315.0},
+			HourRange:  Range{From: 21.37, To: 10.15},
+		},
+	}
+
+	result, err := RunRuleEngine(reading, &rules)
+
+	if err != nil {
+		t.Errorf("Got an error: %v", err)
+	}
+	if result != true {
+		t.Errorf("Rule engine should return true when rule's from is higher than to and angle is bigger than from")
+	}
+}
+
 func getTimeForHour(hour float64) time.Time {
-	return time.Date(2025, time.November, 1, int(hour), int((hour - math.Floor(hour)*60.0)), 0, 0, time.UTC)
+	return time.Date(2025, time.November, 1, int(hour), int((hour-math.Floor(hour))*60.0), 0, 0, time.UTC)
 }

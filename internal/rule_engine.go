@@ -1,8 +1,8 @@
 package internal
 
 type Range struct {
-	From float32
-	To   float32
+	From float64
+	To   float64
 }
 
 type Rule struct {
@@ -11,21 +11,22 @@ type Rule struct {
 	HourRange  Range
 }
 
-func (rng Range) withinAngleRange(angle float32) bool {
+func (rng Range) withinCyclicRange(angle float64) bool {
 	if rng.From > rng.To {
 		return angle >= rng.From || angle <= rng.To
 	}
 	return rng.withinRange(angle)
 }
 
-func (rng Range) withinRange(number float32) bool {
+func (rng Range) withinRange(number float64) bool {
 	return number >= rng.From && number <= rng.To
 }
 
 func RunRuleEngine(dataPoint WindDataPoint, rules *[]Rule) (bool, error) {
 	for _, rule := range *rules {
-		if rule.AngleRange.withinAngleRange(dataPoint.WindAngle) &&
-			rule.SpeedRange.withinRange(dataPoint.WindSpeed) {
+		if rule.AngleRange.withinCyclicRange(dataPoint.WindAngle) &&
+			rule.SpeedRange.withinRange(dataPoint.WindSpeed) &&
+			rule.HourRange.withinCyclicRange(float64(dataPoint.Time.Hour())+float64(dataPoint.Time.Minute())/60.0) {
 			return true, nil
 		}
 	}

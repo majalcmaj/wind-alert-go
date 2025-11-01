@@ -10,6 +10,6 @@ type WeatherReading struct {
 
 type WindDataPoint struct {
 	Time      time.Time
-	WindSpeed float32
-	WindAngle float32
+	WindSpeed float64
+	WindAngle float64
 }

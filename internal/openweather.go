@@ -90,8 +90,8 @@ func getWindDatapoints(readings *[]reading) *[]WindDataPoint {
 	for idx, reading := range *readings {
 		result[idx] = WindDataPoint{
 			Time:      time.Unix(int64(reading.Dt), 0),
-			WindSpeed: float32(reading.WindSpeed),
-			WindAngle: float32(reading.WindDeg),
+			WindSpeed: float64(reading.WindSpeed),
+			WindAngle: float64(reading.WindDeg),
 		}
 	}
 	return &result
