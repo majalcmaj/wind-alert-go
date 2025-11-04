@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -64,9 +65,12 @@ func handler(ctx context.Context, event events.APIGatewayProxyRequest) (*events.
 		return nil, err
 	}
 	
+	forecastJson, _ := json.MarshalIndent(forecast, "", "  ")
+	emailOutputJson, _ := json.MarshalIndent(emailOutput, "", "  ")
+
 	response := events.APIGatewayProxyResponse{
 		StatusCode: 200,
-		Body:       fmt.Sprintf("%+v\nEmail output: %+v", forecast, &emailOutput),
+		Body:       fmt.Sprintf("%s\nEmail output: %s", forecastJson, emailOutputJson),
 	}
 	return &response, nil
 }
