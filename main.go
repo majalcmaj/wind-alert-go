@@ -9,6 +9,10 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/sesv2"
+	"github.com/aws/aws-sdk-go-v2/service/sesv2/types"
 	"github.com/majalcmaj/wind-alert-go/internal"
 )
 
@@ -30,9 +34,39 @@ func handler(ctx context.Context, event events.APIGatewayProxyRequest) (*events.
 		return nil, err
 	}
 
+	config, err := config.LoadDefaultConfig(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	sesClient := sesv2.NewFromConfig(config)
+
+	emailOutput, err := sesClient.SendEmail(ctx, &sesv2.SendEmailInput{
+		Content: &types.EmailContent{
+			Simple: &types.Message{
+				Body: &types.Body{
+					Text: &types.Content{
+						Data: aws.String(fmt.Sprintf("Wind forecast: %+v", forecast)),
+					},
+				},
+				Subject: &types.Content{
+					Data: aws.String("Wind Forecast Alert"),
+				},
+			},	
+		},
+		Destination: &types.Destination{
+			ToAddresses: []string{"majalcmaj@gmail.com"},
+		},
+		FromEmailAddress: aws.String("m.w.ciesiel@gmail.com"),
+	})
+
+	if err != nil {
+		return nil, err
+	}
+	
 	response := events.APIGatewayProxyResponse{
 		StatusCode: 200,
-		Body:       fmt.Sprintf("%+v", forecast),
+		Body:       fmt.Sprintf("%+v\nEmail output: %+v", forecast, &emailOutput),
 	}
 	return &response, nil
 }
