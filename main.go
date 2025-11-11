@@ -41,20 +41,21 @@ func handler(ctx context.Context, event events.APIGatewayProxyRequest) (*events.
 	}
 
 	sesClient := sesv2.NewFromConfig(config)
-	
+
 	forecastJson, _ := json.MarshalIndent(forecast, "", "  ")
 	emailOutput, err := sesClient.SendEmail(ctx, &sesv2.SendEmailInput{
 		Content: &types.EmailContent{
 			Simple: &types.Message{
 				Body: &types.Body{
-					Text: &types.Content{
-						Data: aws.String(fmt.Sprintf("Wind forecast: %s", forecastJson)),
+					Html: &types.Content{
+						Data:    aws.String(fmt.Sprintf("Wind forecast: %s", forecastJson)),
+						Charset: aws.String("UTF-8"),
 					},
 				},
 				Subject: &types.Content{
 					Data: aws.String("Wind Forecast Alert"),
 				},
-			},	
+			},
 		},
 		Destination: &types.Destination{
 			ToAddresses: []string{"majalcmaj@gmail.com"},
@@ -65,7 +66,7 @@ func handler(ctx context.Context, event events.APIGatewayProxyRequest) (*events.
 	if err != nil {
 		return nil, err
 	}
-	
+
 	emailOutputJson, _ := json.MarshalIndent(emailOutput, "", "  ")
 
 	response := events.APIGatewayProxyResponse{

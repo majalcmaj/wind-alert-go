@@ -2,12 +2,15 @@ package internal
 
 import (
 	"bytes"
+	_ "embed"
 	"html/template"
 )
 
-var tpl, parseErr = template.New("mail").Parse(`<h1>Wind alert!</h1>
-<p>Location: {{printf "%.6f,%.6f" .Lat .Lon}}</p>
-`)
+//go:embed mail_template.html
+var mailTemplate string
+
+var tpl, parseErr = template.New("mail").Parse(mailTemplate)
+
 func init() {
 	if parseErr != nil {
 		panic(parseErr)

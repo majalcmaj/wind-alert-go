@@ -19,7 +19,7 @@ func TestRenderingMailDisplaysTitle(t *testing.T) {
 		t.Fatalf("Expected no error but got: %v", err)
 	}
 
-	if !strings.Contains(result, "Wind alert!") {
+	if !strings.Contains(result, "Wind Alert!") {
 		t.Errorf("Expected 'Wind alert!' title to be present but got '%s'", result)
 	}
 }
@@ -42,10 +42,10 @@ func TestRenderingLatLonInformation(t *testing.T) {
 
 func TestRenderingDailyAndHourlyTables(t *testing.T) {
 	reading := WeatherReading{
-		Lat:      40.72137,
-		Lon:      -74.15497,
+		Lat: 40.72137,
+		Lon: -74.15497,
 		Readings: map[string]*[]WindDataPoint{
-			"daily":  {
+			"daily": {
 				{Time: parseTime("2025-01-01T10:00"), WindSpeed: 10, WindAngle: 180},
 				{Time: parseTime("2025-01-02T10:00"), WindSpeed: 20, WindAngle: 80},
 			},
@@ -63,16 +63,16 @@ func TestRenderingDailyAndHourlyTables(t *testing.T) {
 	}
 
 	for _, row := range *reading.Readings["daily"] {
-	  matchRow(t, renderedMail, row)
+		matchRow(t, renderedMail, row)
 	}
 
 	for _, row := range *reading.Readings["hourly"] {
-	  matchRow(t, renderedMail, row)
+		matchRow(t, renderedMail, row)
 	}
 }
 
 func parseTime(tStr string) time.Time {
-	tm, err := time.Parse(time.RFC3339, tStr + ":00Z")
+	tm, err := time.Parse(time.RFC3339, tStr+":00Z")
 	if err != nil {
 		panic(err)
 	}
