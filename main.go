@@ -53,9 +53,9 @@ func handler(ctx context.Context, event events.APIGatewayProxyRequest) (*events.
 			Simple: &types.Message{
 				Body: &types.Body{
 					Html: &types.Content{
-						Data: aws.String(mail),
+						Data:    aws.String(mail),
 						Charset: aws.String("UTF-8"),
-						},
+					},
 				},
 				Subject: &types.Content{
 					Data: aws.String("Wind Forecast Alert"),

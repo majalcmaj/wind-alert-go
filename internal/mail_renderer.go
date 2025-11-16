@@ -9,7 +9,7 @@ import (
 //go:embed mail_template.html
 var mailTemplate string
 
-var tpl, parseErr = template.New("mail").Parse(mailTemplate)
+var tpl, parseErr = template.New("mail").Funcs(template.FuncMap{"windArrow": renderWindArrow}).Parse(mailTemplate)
 
 func init() {
 	if parseErr != nil {

@@ -81,7 +81,7 @@ func parseTime(tStr string) time.Time {
 
 func matchRow(t *testing.T, mailHtml string, row WindDataPoint) {
 	tableRegEx := regexp.MustCompile(
-		fmt.Sprintf(`(?s)<tr.*>.*<td.*>%s</td>.*<td.*>%.1f</td>.*<td.*>%.1f</td>.*</tr>`, row.Time.Format("2006-01-02 15:04"), row.WindSpeed, row.WindAngle))
+		fmt.Sprintf(`(?s)<tr.*>.*<td.*>%s</td>.*<td.*>%.1f</td>.*<td.*>%s</td>.*</tr>`, row.Time.Format("2006-01-02 15:04"), row.WindSpeed, renderWindArrow(row.WindAngle)))
 
 	match := tableRegEx.MatchString(mailHtml)
 	if !match {

@@ -16,7 +16,7 @@
           <tr>
             <td style="padding: 0 15px 0 0;">{{.Time.Format "2006-01-02 15:04"}}</td>
             <td style="padding: 0 15px;">{{printf "%.1f" .WindSpeed}}</td>
-            <td style="padding: 0 0 0 15px;">{{printf "%.1f" .WindAngle}}</td>
+            <td style="padding: 0 0 0 15px;">{{windArrow .WindAngle}}</td>
           </tr>
           {{end}}
         </mj-table>
@@ -31,7 +31,7 @@
           <tr>
             <td style="padding: 0 15px 0 0;">{{.Time.Format "2006-01-02 15:04"}}</td>
             <td style="padding: 0 15px;">{{printf "%.1f" .WindSpeed}}</td>
-            <td style="padding: 0 0 0 15px;">{{printf "%.1f" .WindAngle}}</td>
+            <td style="padding: 0 0 0 15px;">{{windArrow .WindAngle}}</td>
           </tr>
           {{end}}
         </mj-table>
